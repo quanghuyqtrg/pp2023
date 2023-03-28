@@ -5,28 +5,24 @@ class Student:
         self.dob = dob
         self.marks = {}
 
-    def add_mark(self, course_id, marks):
-        self.marks[course_id] = marks
+    def add_mark(self, course_id, mark):
+        self.marks[course_id] = mark
 
     def get_marks(self, course_id):
-        return self.marks.get(course_id, 0)
-    
+        return self.marks.get(course_id, None)
+
 class Course:
     def __init__(self, id, name):
         self.id = id
         self.name = name
         self.marks = {}
 
-    def add_mark(self, student_id, marks):
-        self.marks[student_id] = marks
+    def add_mark(self, student_id, mark):
+        self.marks[student_id] = mark
 
     def get_marks(self, student_id):
-        return self.marks.get(student_id, 0)
-class Mark:
-    def __init__(self, student, course, marks):
-        self.student = student
-        self.course = course
-        self.marks = marks
+        return self.marks.get(student_id, None)
+
 class School:
     def __init__(self):
         self.students = {}
@@ -56,107 +52,93 @@ class School:
             course.add_mark(student_id, marks)
 
     def list_courses(self):
-        for course_id, course in self.courses.items():
-            print(f"{course_id} - {course.name}")
+        print("Courses:")
+        for course in self.courses.values():
+            print(f"{course.id} - {course.name}")
+
     def list_students(self):
-        for student_id, student in self.students.items():
-            print(f"{student_id} - {student.name}")
-    def list_student_marks(self):
-        student_id = input("Enter the student ID: ")
-        student = self.get_student(student_id)
-        if not student:
-            print("Invalid student ID")
-            return
-        for course_id, marks in student.marks.items():
-            course = self.get_course(course_id)
-            print(f"{course.name} - {marks}")
-    def list_course_marks(self):
+        print("Students:")
+        for student in self.students.values():
+            print(f"{student.id} - {student.name} - {student.dob}")
+
+    def show_student_marks(self):
         course_id = input("Enter the course ID: ")
         course = self.get_course(course_id)
         if not course:
             print("Invalid course ID")
             return
-        for student_id, marks in course.marks.items():
-            student = self.get_student(student_id)
+        print(f"Student marks for {course.name}:")
+        for student in self.students.values():
+            marks = student.get_marks(course_id)
             print(f"{student.name} - {marks}")
-    def list_student_average(self):
-        student_id = input("Enter the student ID: ")
-        student = self.get_student(student_id)
-        if not student:
-            print("Invalid student ID")
-            return
-        total = 0
-        for marks in student.marks.values():
-            total += marks
-        print(f"{student.name} - {total / len(student.marks)}")
-    def list_course_average(self):
-        course_id = input("Enter the course ID: ")
-        course = self.get_course(course_id)
-        if not course:
-            print("Invalid course ID")
-            return
-        total = 0
-        for marks in course.marks.values():
-            total += marks
-        print(f"{course.name} - {total / len(course.marks)}")
 
-        
-       
-    
-
-def display_menu():
-    print("1. List students")
-    print("2. List courses")
-    print("3. Add a student")
-    print("4. Add a course")
-    print("5. Input student marks")
-    print("6. List student marks")
-    print("7. List course marks")
-    print("8. List student average")
-    print("9. List course average")
-    print("10. Exit")
-    print()
-def main():
-
-    school = School()
-    school.add_student("S01", "John", "1990-01-01")
-    school.add_student("S02", "Mary", "1990-02-02")
-    school.add_student("S03", "Bob", "1990-03-03")
-    school.add_course("C01", "Maths")
-    school.add_course("C02", "English")
-    school.add_course("C03", "Science")
-    while True:
-        display_menu()
-        choice = input("Enter your choice: ")
-        if choice == "1":
-            school.list_students()
-        elif choice == "2":
-            school.list_courses()
-        elif choice == "3":
+    def add_students(self):
+        num_students = int(input("Enter the number of students to add: "))
+        for i in range(num_students):
             id = input("Enter the student ID: ")
             name = input("Enter the student name: ")
-            dob = input("Enter the student date of birth (YYYY-MM-DD): ")
-            school.add_student(id, name, dob)
-        elif choice == "4":
+            dob = input("Enter the student's date of birth (DD/MM/YYYY): ")
+            self.add_student(id, name, dob)
+
+    def add_courses(self):
+        num_courses = int(input("Enter the number of courses to add: "))
+        for i in range(num_courses):
             id = input("Enter the course ID: ")
             name = input("Enter the course name: ")
-            school.add_course(id, name)
-        elif choice == "5":
-            school.input_student_marks()
-        elif choice == "6":
-            school.list_student_marks()
-        elif choice == "7":
-            school.list_course_marks()
-        elif choice == "8":
-            school.list_student_average()
-        elif choice == "9":
-            school.list_course_average()
-        elif choice == "10":
-            break
-        else:
-            print("Invalid choice")
-        print()
+            self.add_course(id, name)
 
+    def show_course_students(self):
+        course_id = input("Enter the course ID: ")
+        course = self.get_course(course_id)
+        if not course:
+            print("Invalid course ID")
+            return
+        print(f"Students and their marks for {course.name}:")
+        for student in self.students.values():
+            marks = student.get_marks(course_id)
+            print(f"{student.name} - {marks}")
 
+school = School()
 
+while True:
+    print("1. Add student")
+    print("2. Add course")
+    print("3. Add students")
+    print("4. Add courses")
+    print("5. List students")
+    print("6. List courses")
+    print("7. Input student marks")
+    print("8. Show student marks")
+    print("9. Show course students")
+    print("0. Exit")
+    choice = input("Enter your choice: ")
+    if choice == "1":
+        id = input("Enter the student ID: ")
+        name = input("Enter the student name: ")
+        dob = input("Enter the student's date of birth (DD/MM/YYYY): ")
+        school.add_student(id, name, dob)
+    elif choice == "2":
+        id = input("Enter the course ID: ")
+        name = input("Enter the course name: ")
+        school.add_course(id, name)
+    elif choice == "3":
+        school.add_students()
+    elif choice == "4":
+        school.add_courses()
+    elif choice == "5":
+        school.list_students()
+    elif choice == "6":
+        school.list_courses()
+    elif choice == "7":
+        school.input_student_marks()
 
+    elif choice == "8":
+        school.show_student_marks()
+    elif choice == "9":
+        school.show_course_students()
+    elif choice == "0":
+        break
+    else:
+        print("Invalid choice")
+        
+          
